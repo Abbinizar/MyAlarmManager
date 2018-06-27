@@ -25,7 +25,6 @@ public class AlarmReceiver extends BroadcastReceiver {
     public AlarmReceiver(){
 
     }
-
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO: This method is called when the BroadcastReceiver is receiving
@@ -68,11 +67,28 @@ public class AlarmReceiver extends BroadcastReceiver {
         alarmManager.set(alarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         Toast.makeText(context, "one time alarm", Toast.LENGTH_SHORT).show();
     }
+    public void setRepeatingAlarm (Context context, String time, String type, String message){
+        AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context,AlarmReceiver.class);
+        intent.putExtra(EXTRA_MESSAGE, message);
+        intent.putExtra(EXTRA_TYPE, type);
+        String timeArray[]= time.split(":");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeArray[0]));
+        calendar.set(Calendar.MINUTE, Integer.parseInt(timeArray[1]));
+        calendar.set(Calendar.SECOND, 0);
+        int requestCode = NOTIF_ID_REPEATING;
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, 0);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, pendingIntent);
+        Toast.makeText(context, "Repeating alarmset up", Toast.LENGTH_SHORT).show();
+    }
     public void cancelAlarm(Context context, String type){
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
         int requestCode = type.equalsIgnoreCase(TYPE_ONE_TIME) ? NOTIF_ID_ONETIME : NOTIF_ID_REPEATING;
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, 0);
         alarmManager.cancel(pendingIntent);
+        Toast.makeText(context, "Repeating alarm dibatalkan", Toast.LENGTH_SHORT).show();
     }
+
 }
